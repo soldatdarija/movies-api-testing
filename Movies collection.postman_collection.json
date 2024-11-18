@@ -1,0 +1,273 @@
+{
+	"info": {
+		"_postman_id": "e3dd326d-6e08-4504-b747-80079482b966",
+		"name": "Movies collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5743047"
+	},
+	"item": [
+		{
+			"name": "Movies list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test for status code 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Test if the response contains the 'items' array\r",
+							"pm.test(\"Response contains items array\", function () {\r",
+							"    const responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody).to.have.property('items'); //check if 'items' exists\r",
+							"    pm.expect(responseBody.items).to.be.an('array');  //check if 'items' is array\r",
+							"});\r",
+							"\r",
+							"// Test if each movie in 'items' has only required fields (id and title)\r",
+							"pm.test(\"Each movie has required fields\", function () {\r",
+							"    const movies = pm.response.json().items;\r",
+							"    movies.forEach(movie => {\r",
+							"        pm.expect(movie).to.have.property('id');\r",
+							"        pm.expect(movie).to.have.property('title');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Test if 'total' is an integer\r",
+							"pm.test(\"'total' is an integer\", function () {\r",
+							"    const responseBody = pm.response.json();\r",
+							"    pm.expect(responseBody).to.have.property('total');\r",
+							"    pm.expect(responseBody.total).to.be.a('number');\r",
+							"});\r",
+							"// Check for missing fields\r",
+							"// Test if each movie has 'id' and 'title' fields\r",
+							"pm.test(\"Each movie has required fields\", function () {\r",
+							"    const movies = pm.response.json().items;\r",
+							"    movies.forEach(movie => {\r",
+							"        pm.expect(movie).to.have.property('id'); // Check if 'id' exists\r",
+							"        pm.expect(movie).to.have.property('title'); // Check if 'title' exists\r",
+							"\r",
+							"        // Check 'id' is a string (UUID format) instead of a number\r",
+							"        pm.expect(movie.id).to.be.a('string');\r",
+							"        pm.expect(movie.id).to.match(/^[0-9a-fA-F-]{36}$/); // UUID regex validation\r",
+							"        pm.expect(movie.title).to.be.a('string'); // Ensure 'title' is a string\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid http methods/put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid http methods/delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unexpected parameters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/?invalidParam=true",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					],
+					"query": [
+						{
+							"key": "invalidParam",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid parameters",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/?page=abc",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "abc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Large query",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test if large query parameters are handled gracefully\r",
+							"pm.test(\"Large query parameters do not break response\", function () {\r",
+							"    const responseBody = pm.response.json();\r",
+							"\r",
+							"    // Validate response status code\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"\r",
+							"    // Validate response structure\r",
+							"    pm.expect(responseBody).to.have.property('items'); // Ensure 'items' exists\r",
+							"    pm.expect(responseBody.items).to.be.an('array');  // 'items' should be an array\r",
+							"    pm.expect(responseBody).to.have.property('total'); // Ensure 'total' exists\r",
+							"    pm.expect(responseBody.total).to.be.a('number');  // Validate 'total' is a number\r",
+							"\r",
+							"    // Validate that the 'items' array is not empty (if applicable)\r",
+							"    pm.expect(responseBody.items.length).to.be.above(0);\r",
+							"\r",
+							"    // Ensure response times are reasonable\r",
+							"    pm.test(\"Response time is acceptable\", function () {\r",
+							"        pm.expect(pm.response.responseTime).to.be.below(2000); // 2 seconds threshold\r",
+							"    });\r",
+							"\r",
+							"    // Validate individual movie fields\r",
+							"    responseBody.items.forEach(movie => {\r",
+							"        pm.expect(movie).to.have.property('id').that.is.a('string'); // 'id' should be a string\r",
+							"        pm.expect(movie).to.have.property('title').that.is.a('string'); // 'title' should be a string\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies/?search=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies",
+						""
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..."
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid endpoint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://november7-730026606190.europe-west1.run.app/movies_invalid\n",
+					"protocol": "https",
+					"host": [
+						"november7-730026606190",
+						"europe-west1",
+						"run",
+						"app"
+					],
+					"path": [
+						"movies_invalid\n"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
